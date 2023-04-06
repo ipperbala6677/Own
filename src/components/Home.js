@@ -32,7 +32,7 @@ const Home = ({ inventoryData }) => {
                 ))}
               </tbody>
             </Table>
-            <button className="btn btn-primary" onClick={handleEditList}>
+            <button className="btn btn-primary" onClick={handleEditList} style={{paddingInline:"5% 5%"}}>
               Edit List
             </button>
           </CardBody>
