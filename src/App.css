@@ -19,9 +19,6 @@
   color: #1f2f36;
 }
 
-
-
-
 table {
   text-align: left;
 }
@@ -39,4 +36,24 @@ table {
 
 .App-link {
   color: var(--bs-primary)
+}
+
+.flex-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.title {
+  text-align: left;
+  font-size: 25px;
+  padding: 10px;
+  background-color: #f2f2f2;
+  width: 100%;
+  margin-top: 15px;
+}
+
+.transform {
+  cursor: pointer;
+  transform: scale(1, -1)
 }

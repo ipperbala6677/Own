@@ -1,33 +1,44 @@
 import React, { useState } from "react";
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Input,
-  Button,
-  Table,
-  Col,
-  CloseButton,
-} from "reactstrap";
+import { Card, CardBody, Input, Button, Table } from "reactstrap";
+import "./../App.css";
 
 const Lists = ({ inventoryData, setInventoryData }) => {
   const [quantity, setQuantity] = useState("");
   const [inputText, setInputText] = useState("");
+  const [counter, setCounter] = useState(() => {
+    const storedCounter = localStorage.getItem("counter");
+    return storedCounter !== null ? parseInt(storedCounter) : 0;
+  });
+
   const handleAdd = () => {
-    if (!inputText) {
-      alert("Please Enter Item Name");
-      return;
+    if (checkValidation()) {
+      const item = {
+        id: counter + 1,
+        name: inputText,
+        quantity: quantity,
+      };
+      const tempInventoryData = [...inventoryData];
+      tempInventoryData.push(item);
+      setInventoryData(tempInventoryData);
+      localStorage.setItem("inventory-data", JSON.stringify(tempInventoryData));
+      localStorage.setItem("counter", counter + 1);
+      setCounter(counter + 1);
+      setInputText("");
+      setQuantity("");
     }
-    const item = {
-      id: Math.floor(Math.random() * 1000),
-      name: inputText,
-      quantity: quantity,
-    };
-    const tempInventoryData = [...inventoryData];
-    tempInventoryData.push(item);
-    setInventoryData(tempInventoryData);
-    setInputText("");
-    setQuantity("");
+  };
+
+  const checkValidation = () => {
+    if (!inputText || !quantity) {
+      alert("Please enter required fields");
+      return false;
+    }
+    if (quantity <= 0) {
+      alert("Quantity should be greater than 0");
+      setQuantity("");
+      return false;
+    }
+    return true;
   };
 
   const handleDelete = (id) => {
@@ -37,6 +48,29 @@ const Lists = ({ inventoryData, setInventoryData }) => {
 
   const handleClearAll = () => {
     setInventoryData([]);
+    localStorage.removeItem("inventory-data");
+    localStorage.removeItem("counter");
+    setCounter(0);
+  };
+
+  const handleIncrementQuantity = (id) => {
+    const index = inventoryData.findIndex((item) => item.id === id);
+    if (index !== -1) {
+      const tempInventoryData = [...inventoryData];
+      tempInventoryData[index].quantity =
+        parseInt(tempInventoryData[index].quantity) + 1;
+      setInventoryData(tempInventoryData);
+    }
+  };
+
+  const handleDecrementQuantity = (id) => {
+    const index = inventoryData.findIndex((item) => item.id === id);
+    if (index !== -1 && inventoryData[index].quantity !== 1) {
+      const tempInventoryData = [...inventoryData];
+      tempInventoryData[index].quantity =
+        parseInt(tempInventoryData[index].quantity) - 1;
+      setInventoryData(tempInventoryData);
+    }
   };
 
   return (
@@ -44,18 +78,21 @@ const Lists = ({ inventoryData, setInventoryData }) => {
       <div className="d-flex justify-content-center">
         <Card className="w-50">
           <CardBody>
-            <div style={{ display: "flex" }}>
-              <span style={{ textAlign: "left", marginRight: "37%" }}>
-                {" "}
-                <h3 style={{ fontSize: "25px" }}>Item Name *</h3>
-              </span>
-              <span style={{ textAlign: "right", marginLeft: "33%" }}>
-                {" "}
-                <h3 style={{ fontSize: "25px" }}>Quantity *</h3>
-              </span>
+            <div
+              className="flex-container"
+              style={{
+                width: "93%",
+              }}
+            >
+              <h5>Item Name *</h5>
+              <h5>Quantity *</h5>
             </div>
-
-            <div style={{ display: "flex" }}>
+            <div
+              className="flex-container"
+              style={{
+                width: "100%",
+              }}
+            >
               <Input
                 style={{ marginRight: "2%", backgroundColor: "#f2f2f2" }}
                 onChange={(e) => setInputText(e.target.value)}
@@ -65,6 +102,7 @@ const Lists = ({ inventoryData, setInventoryData }) => {
                 style={{ width: "100px", backgroundColor: "#f2f2f2" }}
                 onChange={(e) => setQuantity(e.target.value)}
                 value={quantity}
+                type={"number"}
               ></Input>
               <Button color="primary" onClick={handleAdd}>
                 Add
@@ -81,24 +119,39 @@ const Lists = ({ inventoryData, setInventoryData }) => {
               To get started, add 1 or more items
             </div>
 
-            <h3
-              style={{
-                textAlign: "left",
-                fontSize: "25px",
-                padding: "10px",
-                backgroundColor: "#f2f2f2",
-                width: "100%",
-                marginTop: "15px",
-              }}
-            >
-              Inventory List
-            </h3>
-            <Table className="">
+            <h3 className="title">Inventory List</h3>
+            <Table>
               <tbody>
                 {inventoryData.map((item) => (
                   <tr>
                     <th scope="row">{item.name}</th>
-                    <td>Quantity: {item.quantity}</td>
+                    <td>
+                      <div style={{ display: "flex", alignItems: "center" }}>
+                        <div style={{ width: "20%" }}>
+                          Quantity: {item.quantity}
+                        </div>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            paddingLeft: "12px",
+                          }}
+                        >
+                          <div
+                            className="transform"
+                            onClick={() => handleIncrementQuantity(item.id)}
+                          >
+                            V
+                          </div>
+                          <div
+                            style={{ cursor: "pointer", marginTop: "-8px" }}
+                            onClick={() => handleDecrementQuantity(item.id)}
+                          >
+                            V
+                          </div>
+                        </div>
+                      </div>
+                    </td>
 
                     <td>
                       <div
